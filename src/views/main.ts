@@ -4,10 +4,13 @@ import { getDaysViewLayout } from './daysView';
 import { getMaxEventsVisible } from '../utils/monthViewHelper';
 import { getMonthViewLayout } from './monthView';
 import { mapEventsToDate, parseToCalendarDays } from '../utils/Helper';
+import { validateInput } from '../utils/validator';
 
 export default (data: LayoutRequestData): Promise<LayoutResult> => {
   return new Promise((resolve) => {
     if (data) {
+      validateInput(data);
+
       const { events, width, config, height, isMobile, selectedView } = data;
 
       // parse to calendar days if dates are ISO string
