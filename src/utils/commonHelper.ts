@@ -1,6 +1,6 @@
 import { CALENDAR_VIEW, CalendarEvent, EventLayoutData } from '../index';
 import { DateTime } from 'luxon';
-import { EVENT_TABLE_DELIMITER_SPACE, getEventHeight, MONTH_EVENT_HEIGHT } from '../constants';
+import { EVENT_TABLE_DELIMITER_SPACE, getEventHeight } from '../constants';
 import { formatToDateKey } from './Helper';
 
 export interface RowLayoutResult {

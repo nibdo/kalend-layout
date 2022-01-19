@@ -1,10 +1,10 @@
 /* eslint-disable no-undef */
 
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
+import { MONTH_EVENT_HEIGHT } from '../../constants';
 import { TEST_TIMEZONE, createConfigMock, getMonthDaysMock } from '../common';
 import KalendLayout from '../../views/main';
 import assert from 'assert';
-import { MONTH_EVENT_HEIGHT } from '../../constants';
 
 const eventA: any = {
   id: '2',

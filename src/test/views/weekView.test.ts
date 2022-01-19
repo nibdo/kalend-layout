@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
+import { HEADER_EVENT_HEIGHT } from '../../constants';
 import { TEST_TIMEZONE, createConfigMock, getWeekDaysMock } from '../common';
 import KalendLayout from '../../views/main';
 import assert from 'assert';
-import { HEADER_EVENT_HEIGHT } from '../../constants';
 
 const eventA: any = {
   id: '2',

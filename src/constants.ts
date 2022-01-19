@@ -13,9 +13,9 @@ export const MONTH_EVENT_HEIGHT = 17;
 export const HEADER_EVENT_HEIGHT = 20;
 
 export const getEventHeight = (isHeaderEvents?: boolean) => {
-    if (isHeaderEvents) {
-        return HEADER_EVENT_HEIGHT
-    }
+  if (isHeaderEvents) {
+    return HEADER_EVENT_HEIGHT;
+  }
 
-    return MONTH_EVENT_HEIGHT
-}
+  return MONTH_EVENT_HEIGHT;
+};
