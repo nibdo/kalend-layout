@@ -9,3 +9,4 @@ export const SHOW_TIME_THRESHOLD = 60;
 export const ONE_DAY = 1;
 export const THREE_DAYS = 3;
 export const SEVEN_DAYS = 7;
+export const MONTH_EVENT_HEIGHT = 17;
