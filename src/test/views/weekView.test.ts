@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
+import { HEADER_EVENT_HEIGHT } from '../../constants';
 import { TEST_TIMEZONE, createConfigMock, getWeekDaysMock } from '../common';
 import KalendLayout from '../../views/main';
 import assert from 'assert';
@@ -170,22 +171,22 @@ describe(`weekView layout`, function () {
 
     assert.equal(result.normalPositions?.['15-11-2021'].length, 0);
 
-    assert.equal(eventResult1.height, 20);
+    assert.equal(eventResult1.height, HEADER_EVENT_HEIGHT);
     assert.equal(eventResult1.width, 95);
     assert.equal(eventResult1.offsetLeft, 2);
     assert.equal(eventResult1.offsetTop, 0);
 
-    assert.equal(eventResult2.height, 20);
+    assert.equal(eventResult2.height, HEADER_EVENT_HEIGHT);
     assert.equal(eventResult2.width, 199);
     assert.equal(eventResult2.offsetLeft, 2);
     assert.equal(eventResult2.offsetTop, 21);
 
-    assert.equal(eventResult3.height, 20);
+    assert.equal(eventResult3.height, HEADER_EVENT_HEIGHT);
     assert.equal(eventResult3.width, 95);
     assert.equal(eventResult3.offsetLeft, 105.57142857142857);
     assert.equal(eventResult3.offsetTop, 0);
 
-    assert.equal(eventResult4.height, 20);
+    assert.equal(eventResult4.height, HEADER_EVENT_HEIGHT);
     assert.equal(eventResult4.width, 199);
     assert.equal(eventResult4.offsetLeft, 105.57142857142857);
     assert.equal(eventResult4.offsetTop, 42);

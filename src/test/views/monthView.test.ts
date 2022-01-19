@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
+import { MONTH_EVENT_HEIGHT } from '../../constants';
 import { TEST_TIMEZONE, createConfigMock, getMonthDaysMock } from '../common';
 import KalendLayout from '../../views/main';
 import assert from 'assert';
@@ -69,12 +70,12 @@ describe(`monthView layout`, function () {
     assert.equal(positions.length, 2);
     assert.equal(positions[0].event.id, eventA.id);
     assert.equal(positions[0].width, 92);
-    assert.equal(positions[0].height, 20);
+    assert.equal(positions[0].height, MONTH_EVENT_HEIGHT);
     assert.equal(positions[0].offsetTop, 0);
     assert.equal(positions[0].offsetLeft, 2);
     assert.equal(positions[1].event.id, eventB.id);
     assert.equal(positions[1].width, 92);
-    assert.equal(positions[1].height, 20);
+    assert.equal(positions[1].height, MONTH_EVENT_HEIGHT);
     assert.equal(positions[1].offsetTop, 0);
     assert.equal(positions[1].offsetLeft, 102);
     assert.equal(JSON.stringify(result.overflowingEvents), '{}');
@@ -91,13 +92,13 @@ describe(`monthView layout`, function () {
     assert.equal(positions.length, 3);
     assert.equal(positions[1].event.id, eventB.id);
     assert.equal(positions[1].width, 92);
-    assert.equal(positions[1].height, 20);
+    assert.equal(positions[1].height, MONTH_EVENT_HEIGHT);
     assert.equal(positions[1].offsetTop, 0);
     assert.equal(positions[1].offsetLeft, 102);
     assert.equal(positions[2].event.id, eventC.id);
     assert.equal(positions[2].width, 192);
-    assert.equal(positions[2].height, 20);
-    assert.equal(positions[2].offsetTop, 21);
+    assert.equal(positions[2].height, MONTH_EVENT_HEIGHT);
+    assert.equal(positions[2].offsetTop, 18);
     assert.equal(positions[2].offsetLeft, 102);
     assert.equal(JSON.stringify(result.overflowingEvents), '{}');
   });
@@ -134,8 +135,8 @@ describe(`monthView layout`, function () {
     const positions = result.positions?.[1];
 
     assert.equal(result.positions?.length, 6);
-    assert.equal(positions.length, 2);
-    assert.equal(result.overflowingEvents['09-11-2021'].length, 4);
+    assert.equal(positions.length, 3);
+    assert.equal(result.overflowingEvents['09-11-2021'].length, 3);
   });
 
   it(
@@ -162,7 +163,7 @@ describe(`monthView layout`, function () {
 
       assert.equal(result.positions?.length, 6);
       assert.equal(positions.length, 3);
-      assert.equal(result.overflowingEvents['09-11-2021'].length, 4);
+      assert.equal(result.overflowingEvents['09-11-2021'].length, 3);
     }
   );
 
@@ -199,16 +200,16 @@ describe(`monthView layout`, function () {
     const positions = result.positions?.[1];
 
     assert.equal(result.positions?.length, 6);
-    assert.equal(positions.length, 3);
+    assert.equal(positions.length, 4);
     assert.equal(positions[0].offsetTop, 0);
     assert.equal(positions[0].width, 292);
     assert.equal(positions[0].offsetLeft, 102);
-    assert.equal(positions[1].offsetTop, 21);
+    assert.equal(positions[1].offsetTop, 18);
     assert.equal(positions[1].width, 92);
     assert.equal(positions[1].offsetLeft, 102);
-    assert.equal(positions[2].offsetTop, 21);
-    assert.equal(positions[2].width, 92);
-    assert.equal(positions[2].offsetLeft, 202);
+    assert.equal(positions[2].offsetTop, 36);
+    assert.equal(positions[2].width, 192);
+    assert.equal(positions[2].offsetLeft, 102);
   });
 
   it('should return event from previous month', async function () {

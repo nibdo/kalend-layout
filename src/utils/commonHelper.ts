@@ -1,6 +1,6 @@
 import { CALENDAR_VIEW, CalendarEvent, EventLayoutData } from '../index';
 import { DateTime } from 'luxon';
-import { EVENT_TABLE_DELIMITER_SPACE } from '../constants';
+import { EVENT_TABLE_DELIMITER_SPACE, getEventHeight } from '../constants';
 import { formatToDateKey } from './Helper';
 
 export interface RowLayoutResult {
@@ -21,6 +21,10 @@ interface CalendarEventRowExtended extends CalendarEvent {
  */
 const findFreeSlot = (indexes: number[], maxEventsVisible: number): number => {
   let freeIndex;
+
+  if (!maxEventsVisible || maxEventsVisible <= 0) {
+    return -999;
+  }
 
   for (let i = 0; i < maxEventsVisible + 1; i++) {
     if (indexes.length === 0 || !indexes.includes(i)) {
@@ -80,8 +84,8 @@ const addEventToResult = (
     event,
     width: Math.round(eventWidth - tableSpace),
     offsetLeft: dayIndex * width + 2,
-    offsetTop: 20 * offsetTopIndex + offsetTopIndex,
-    height: 20,
+    offsetTop: getEventHeight(isHeaderEvents) * offsetTopIndex + offsetTopIndex,
+    height: getEventHeight(isHeaderEvents),
     zIndex: 2,
   };
 
@@ -155,7 +159,18 @@ export const getRowLayout = (
           : eventRealIndex;
 
         if (!usedIDs.includes(event.id)) {
+          //
+          if (
+            !maxEventsVisible ||
+            maxEventsVisible <= 0 ||
+            eventRealIndex >= maxEventsVisible ||
+            offsetTopIndex >= maxEventsVisible
+          ) {
+            offsetTopIndex = -999;
+          }
+
           eventRealIndex += 1;
+
           // check for overflowing events
           if (offsetTopIndex === -1 && overflowingEvents) {
             // save all clones to overflown array
@@ -171,7 +186,7 @@ export const getRowLayout = (
                   : 0; // we can use 0 top index as either next day wasn't
                 // iterated yet or takenSlotsSpawn exists for that column
 
-                if (offsetTopIndex === -1 && overflowingEvents) {
+                if (offsetTopIndex <= -1 && overflowingEvents) {
                   if (overflowingEvents[daySpawn]) {
                     overflowingEvents[daySpawn] = [
                       ...overflowingEvents[daySpawn],
@@ -214,6 +229,15 @@ export const getRowLayout = (
               } else {
                 overflowingEvents[event.originDate] = [event];
               }
+            }
+          } else if (offsetTopIndex === -999) {
+            if (overflowingEvents[event.originDate]) {
+              overflowingEvents[event.originDate] = [
+                ...overflowingEvents[event.originDate],
+                event,
+              ];
+            } else {
+              overflowingEvents[event.originDate] = [event];
             }
           } else {
             const eventAddResult = addEventToResult(

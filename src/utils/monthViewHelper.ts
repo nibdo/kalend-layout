@@ -3,7 +3,8 @@
  * @param height
  */
 export const getMaxEventsVisible = (height: number) => {
-  return (height / 6 - 25) / 26 - 2;
+  const result = Number(((height / 6 - 22) / 19 - 1).toFixed(0));
+  return result;
 };
 
 /**
