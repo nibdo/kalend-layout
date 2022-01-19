@@ -3,7 +3,15 @@
  * @param height
  */
 export const getMaxEventsVisible = (height: number) => {
-  const result = Number(((height / 6 - 22) / 19 - 1).toFixed(0));
+  const baseHeight = parseInt((height / 6 - 22).toString());
+
+  // number of events
+  const baseFit = (baseHeight - 15) / 17;
+
+  // number of events with offset top
+  const baseFitWithOffset = (baseHeight - 15) / (17 + baseFit);
+
+  const result = parseInt(baseFitWithOffset.toString());
   return result;
 };
 
