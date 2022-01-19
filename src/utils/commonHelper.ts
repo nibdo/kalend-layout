@@ -1,6 +1,6 @@
 import { CALENDAR_VIEW, CalendarEvent, EventLayoutData } from '../index';
 import { DateTime } from 'luxon';
-import { EVENT_TABLE_DELIMITER_SPACE, MONTH_EVENT_HEIGHT } from '../constants';
+import { EVENT_TABLE_DELIMITER_SPACE, getEventHeight, MONTH_EVENT_HEIGHT } from '../constants';
 import { formatToDateKey } from './Helper';
 
 export interface RowLayoutResult {
@@ -84,8 +84,8 @@ const addEventToResult = (
     event,
     width: Math.round(eventWidth - tableSpace),
     offsetLeft: dayIndex * width + 2,
-    offsetTop: MONTH_EVENT_HEIGHT * offsetTopIndex + offsetTopIndex,
-    height: MONTH_EVENT_HEIGHT,
+    offsetTop: getEventHeight(isHeaderEvents) * offsetTopIndex + offsetTopIndex,
+    height: getEventHeight(isHeaderEvents),
     zIndex: 2,
   };
 
