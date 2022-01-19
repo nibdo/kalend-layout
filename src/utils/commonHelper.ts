@@ -103,6 +103,18 @@ export const DEFAULT_ROW_LAYOUT_RESULT = {
   headerOffsetTop: 0,
 };
 
+const addToOverflowingEvents = (
+  event: any,
+  date: string,
+  overflowingEvents: any
+) => {
+  if (overflowingEvents[date]) {
+    overflowingEvents[date] = [...overflowingEvents[date], event];
+  } else {
+    overflowingEvents[date] = [event];
+  }
+};
+
 /**
  * Use for month view and header events
  * @param events
@@ -187,14 +199,7 @@ export const getRowLayout = (
                 // iterated yet or takenSlotsSpawn exists for that column
 
                 if (offsetTopIndex <= -1 && overflowingEvents) {
-                  if (overflowingEvents[daySpawn]) {
-                    overflowingEvents[daySpawn] = [
-                      ...overflowingEvents[daySpawn],
-                      event,
-                    ];
-                  } else {
-                    overflowingEvents[daySpawn] = [event];
-                  }
+                  addToOverflowingEvents(event, daySpawn, overflowingEvents);
                 } else {
                   const eventAddResult = addEventToResult(
                     usedIDs,
@@ -221,23 +226,23 @@ export const getRowLayout = (
                 }
               });
             } else {
-              if (overflowingEvents[event.originDate]) {
-                overflowingEvents[event.originDate] = [
-                  ...overflowingEvents[event.originDate],
-                  event,
-                ];
-              } else {
-                overflowingEvents[event.originDate] = [event];
-              }
+              addToOverflowingEvents(
+                event,
+                event.originDate,
+                overflowingEvents
+              );
             }
           } else if (offsetTopIndex === -999) {
-            if (overflowingEvents[event.originDate]) {
-              overflowingEvents[event.originDate] = [
-                ...overflowingEvents[event.originDate],
-                event,
-              ];
+            if (event.daySpawns) {
+              event.daySpawns.forEach((daySpawn) => {
+                addToOverflowingEvents(event, daySpawn, overflowingEvents);
+              });
             } else {
-              overflowingEvents[event.originDate] = [event];
+              addToOverflowingEvents(
+                event,
+                event.originDate,
+                overflowingEvents
+              );
             }
           } else {
             const eventAddResult = addEventToResult(
