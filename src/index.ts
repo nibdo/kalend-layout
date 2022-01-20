@@ -82,9 +82,10 @@ export interface LayoutResult {
   positions?: any[];
   overflowingEvents?: any;
   headerOffsetTop?: number;
-  calendarDays: DateTime[];
+  calendarDays?: DateTime[];
   headerPositions?: any;
   normalPositions?: any;
+  events?: any;
 }
 
 export default KalendLayout;

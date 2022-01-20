@@ -53,7 +53,10 @@ export default (data: LayoutRequestData): Promise<LayoutResult> => {
         // format events to date key obj
         const eventsDateKeyed: any = mapEventsToDate(events, config.timezone);
 
-        resolve(eventsDateKeyed);
+        resolve({
+          events: eventsDateKeyed,
+          selectedView: CALENDAR_VIEW.AGENDA,
+        });
       }
     }
   });
