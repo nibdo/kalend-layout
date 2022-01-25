@@ -43,6 +43,7 @@ export interface CalendarEvent {
   summary: string;
   color: string;
   allDay?: boolean;
+  internalID?: string;
   [key: string]: any;
 }
 

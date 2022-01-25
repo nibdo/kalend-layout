@@ -48,7 +48,7 @@ const addEventToResult = (
   result: any,
   isHeaderEvents?: boolean
 ) => {
-  usedIDs.push(event.id);
+  usedIDs.push(`${event.id}_${event.internalID}`);
   if (event.daySpawns) {
     event.daySpawns.forEach((daySpawn) => {
       if (takenIndexes[daySpawn]) {
