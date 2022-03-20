@@ -1,5 +1,6 @@
 import { CalendarEvent } from '../index';
 import { DateTime } from 'luxon';
+import { parseToDateTime } from './LuxonHelper';
 
 // TODO should add timezone?
 export const formatToDateKey = (date: DateTime, timezone?: string) =>
@@ -13,7 +14,8 @@ export const mapEventsToDate = (events: CalendarEvent[], timezone: string) => {
   }
 
   events?.forEach((event) => {
-    const startDate: DateTime = DateTime.fromISO(event.startAt).setZone(
+    const startDate: DateTime = parseToDateTime(
+      event.startAt,
       event.timezoneStartAt || timezone
     );
     const key: string = formatToDateKey(startDate);

@@ -1,6 +1,5 @@
 import { CalendarEvent, Config } from '../index';
-import { DateTime } from 'luxon';
-import { LuxonHelper } from './LuxonHelper';
+import { LuxonHelper, parseToDateTime } from './LuxonHelper';
 import { formatToDateKey } from './Helper';
 import { getEventDateTime } from './KalendHelper';
 
@@ -30,7 +29,7 @@ export const parseAllDayEvents = (events: any, timezone: string) => {
 
     eventsItems.forEach((item: CalendarEvent) => {
       const dateKey: any = formatToDateKey(
-        DateTime.fromISO(item.startAt).setZone(item.timezoneStartAt || timezone)
+        parseToDateTime(item.startAt, item.timezoneStartAt || timezone)
       );
 
       if (result[dateKey]) {
