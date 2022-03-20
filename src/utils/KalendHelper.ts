@@ -1,6 +1,6 @@
 import { CALENDAR_VIEW, CalendarEvent, Config } from '../index';
-import { DateTime } from 'luxon';
 import { ONE_DAY, SCROLLBAR_WIDTH, SEVEN_DAYS, THREE_DAYS } from '../constants';
+import { parseToDateTime } from './LuxonHelper';
 
 export const getDaysNum = (calendarView: CALENDAR_VIEW): number => {
   switch (calendarView) {
@@ -36,10 +36,12 @@ export const getCorrectWidth = (
 };
 
 export const getEventDateTime = (event: CalendarEvent, config: Config) => {
-  const dateTimeStart = DateTime.fromISO(event.startAt).setZone(
+  const dateTimeStart = parseToDateTime(
+    event.startAt,
     event.timezoneStartAt || config.timezone
   );
-  const dateTimeEnd = DateTime.fromISO(event.endAt).setZone(
+  const dateTimeEnd = parseToDateTime(
+    event.endAt,
     event.timezoneStartAt || config.timezone
   );
 

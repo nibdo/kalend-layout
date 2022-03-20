@@ -5,7 +5,7 @@ import {
   getRowLayout,
 } from '../utils/commonHelper';
 import { DateTime } from 'luxon';
-import { LuxonHelper } from '../utils/LuxonHelper';
+import { LuxonHelper, parseToDateTime } from '../utils/LuxonHelper';
 import { formatToDateKey } from '../utils/Helper';
 import { getEventDateTime } from '../utils/KalendHelper';
 import { getMonthRows } from '../utils/monthViewHelper';
@@ -82,9 +82,7 @@ export const prepareMultiDayEvents = (
     } else {
       // single day event
       const dateKey = formatToDateKey(
-        DateTime.fromISO(event.startAt).setZone(
-          event.timezoneStartAt || config.timezone
-        )
+        parseToDateTime(event.startAt, event.timezoneStartAt || config.timezone)
       );
 
       event.originDate = originDate;

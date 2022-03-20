@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
-import { HEADER_EVENT_HEIGHT } from '../../constants';
+import { FLOATING_DATETIME, HEADER_EVENT_HEIGHT } from '../../constants';
 import { TEST_TIMEZONE, createConfigMock, getWeekDaysMock } from '../common';
 import KalendLayout from '../../views/main';
 import assert from 'assert';
@@ -208,5 +208,33 @@ describe(`weekView layout`, function () {
     assert.equal(result.headerPositions[0].offsetLeft, 2);
     assert.equal(result.headerPositions[0].event.allDay, true);
     assert.equal(result.normalPositions?.['15-11-2021'].length, 0);
+  });
+
+  it('should return layout with all day event with floating timezone', async function () {
+    const result = await KalendLayout(
+      weekViewLayoutData([
+        {
+          ...eventC,
+          startAt: '2021-11-17T00:00:00.000Z',
+          endAt: '2021-11-17T23:59:00.000Z',
+          allDay: true,
+          timezoneStartAt: FLOATING_DATETIME,
+        },
+      ])
+    );
+
+    assert.equal(result.headerPositions.length, 1);
+    assert.equal(result.headerPositions[0].width, 95);
+    assert.equal(result.headerPositions[0].offsetLeft, 209.14285714285714);
+    assert.equal(result.headerPositions[0].event.allDay, true);
+    assert.equal(
+      result.headerPositions[0].event.startAt,
+      '2021-11-17T00:00:00.000Z'
+    );
+    assert.equal(
+      result.headerPositions[0].event.timezoneStartAt,
+      FLOATING_DATETIME
+    );
+    assert.equal(result.normalPositions?.['17-11-2021'].length, 0);
   });
 });

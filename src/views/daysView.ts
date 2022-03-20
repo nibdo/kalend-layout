@@ -254,7 +254,8 @@ export const getDaysViewLayout = (
   const normalEvents: any = {};
 
   eventsParsed.forEach((event) => {
-    const startDate: DateTime = DateTime.fromISO(event.startAt).setZone(
+    const startDate: DateTime = parseToDateTime(
+      event.startAt,
       event.timezoneStartAt || config.timezone
     );
     const key: string = formatToDateKey(startDate, config.timezone);
