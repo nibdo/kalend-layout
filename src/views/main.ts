@@ -1,9 +1,10 @@
 import { CALENDAR_VIEW, LayoutRequestData, LayoutResult } from '../index';
 import { checkIfIsDaysView } from '../utils/commonHelper';
+import { getAgendaView } from './agendaView';
 import { getDaysViewLayout } from './daysView';
 import { getMaxEventsVisible } from '../utils/monthViewHelper';
 import { getMonthViewLayout } from './monthView';
-import { mapEventsToDate, parseToCalendarDays } from '../utils/Helper';
+import { parseToCalendarDays } from '../utils/Helper';
 import { validateInput } from '../utils/validator';
 
 export default (data: LayoutRequestData): Promise<LayoutResult> => {
@@ -50,11 +51,9 @@ export default (data: LayoutRequestData): Promise<LayoutResult> => {
           normalPositions: result.normalPositions,
         });
       } else if (selectedView === CALENDAR_VIEW.AGENDA) {
-        // format events to date key obj
-        const eventsDateKeyed: any = mapEventsToDate(events, config.timezone);
-
+        const agendaEvents = getAgendaView(events, config);
         resolve({
-          events: eventsDateKeyed,
+          events: agendaEvents,
           selectedView: CALENDAR_VIEW.AGENDA,
         });
       }
