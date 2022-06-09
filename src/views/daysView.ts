@@ -5,11 +5,15 @@ import {
   EVENT_TABLE_DELIMITER_SPACE,
   SHOW_TIME_THRESHOLD,
 } from '../constants';
+import { LuxonHelper, parseToDateTime } from '../utils/LuxonHelper';
 import { calculatePositionForHeaderEvents } from '../utils/headerViewHelper';
 import { formatToDateKey } from '../utils/Helper';
-import { getCorrectWidth, getDaysNum } from '../utils/KalendHelper';
+import {
+  getCorrectWidth,
+  getDaysNum,
+  getEventDateTime,
+} from '../utils/KalendHelper';
 import { parseAllDayEventsArray } from '../utils/allDayEvents';
-import { parseToDateTime } from '../utils/LuxonHelper';
 
 const checkOverlappingYCoordinates = (
   item: any,
@@ -254,11 +258,8 @@ export const getDaysViewLayout = (
   const normalEvents: any = {};
 
   eventsParsed.forEach((event) => {
-    const startDate: DateTime = parseToDateTime(
-      event.startAt,
-      event.timezoneStartAt || config.timezone
-    );
-    const key: string = formatToDateKey(startDate, config.timezone);
+    const { dateTimeStart, dateTimeEnd } = getEventDateTime(event, config);
+    const key: string = formatToDateKey(dateTimeStart, config.timezone);
 
     if (event.allDay) {
       headerEventsTemp.push(event);
@@ -268,7 +269,36 @@ export const getDaysViewLayout = (
         headerEvents[key] = [event];
       }
     } else {
-      if (normalEvents[key]) {
+      // check if start and end on different days
+      const isSameDay = LuxonHelper.isSameDay(dateTimeStart, dateTimeEnd);
+
+      // origin date to determine when event starts in each row
+      let originDate: any = formatToDateKey(dateTimeStart);
+
+      // handle multi-day
+      if (!isSameDay) {
+        for (let i = 0; i <= 1; i++) {
+          if (i == 0) {
+            const refDate = dateTimeStart.plus({ days: i });
+            originDate = formatToDateKey(refDate);
+          }
+
+          const eventClone = {
+            ...event,
+            originDate,
+            daysAfter: 1 - i,
+          };
+
+          if (!normalEvents[originDate]) {
+            normalEvents[originDate] = [eventClone];
+          } else {
+            normalEvents[originDate] = [
+              ...normalEvents[originDate],
+              ...[eventClone],
+            ];
+          }
+        }
+      } else if (normalEvents[key]) {
         normalEvents[key] = [...normalEvents[key], ...[event]];
       } else {
         normalEvents[key] = [event];

@@ -14,6 +14,15 @@ const eventA: any = {
   timezoneStartAt: TEST_TIMEZONE,
 };
 
+const eventB: any = {
+  id: '1',
+  summary: 'Test 1',
+  calendarID: '1',
+  startAt: '2021-11-15T22:00:00.000Z',
+  endAt: '2021-11-16T09:00:00.000Z',
+  timezoneStartAt: TEST_TIMEZONE,
+};
+
 const eventC: any = {
   id: '4',
   summary: 'Test 3',
@@ -56,6 +65,28 @@ describe(`weekView layout`, function () {
     assert.equal(eventCResult.offsetLeft, 0);
     assert.equal(eventCResult.offsetTop, 760);
     assert.equal(eventCResult.event.allDay, false);
+  });
+
+  it('should return layout with event that cross midnight', async function () {
+    const result = await KalendLayout(weekViewLayoutData([eventB]));
+
+    const eventBResultOne = result.normalPositions?.['15-11-2021'][0];
+    const eventBResultTwo = result.normalPositions?.['16-11-2021'][0];
+
+    assert.equal(result.headerPositions.length, 0);
+    assert.equal(result.normalPositions?.['15-11-2021'].length, 1);
+    assert.equal(result.normalPositions?.['16-11-2021'].length, 1);
+    assert.equal(eventBResultOne.height, 40);
+    assert.equal(eventBResultOne.width, 95.28571428571428);
+    assert.equal(eventBResultOne.offsetLeft, 0);
+    assert.equal(eventBResultOne.offsetTop, 760);
+    assert.equal(eventBResultOne.event.allDay, false);
+
+    assert.equal(eventBResultTwo.height, 40);
+    assert.equal(eventBResultTwo.width, 95.28571428571428);
+    assert.equal(eventBResultTwo.offsetLeft, 0);
+    assert.equal(eventBResultTwo.offsetTop, 760);
+    assert.equal(eventBResultTwo.event.allDay, false);
   });
 
   it('should return layout with two stack events', async function () {

@@ -13,7 +13,9 @@ export const parseAllDayEvent = (
 
   return {
     ...event,
-    allDay: event.allDay || !LuxonHelper.isSameDay(dateTimeStart, dateTimeEnd),
+    allDay:
+      event.allDay ||
+      LuxonHelper.differenceInDays(dateTimeStart, dateTimeEnd) > 0,
   };
 };
 

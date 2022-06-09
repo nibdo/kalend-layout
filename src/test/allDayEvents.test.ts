@@ -23,8 +23,17 @@ const eventB: any = {
   timezoneStartAt: TEST_TIMEZONE,
 };
 
+const eventC: any = {
+  id: '4',
+  summary: 'Test 4',
+  calendarID: '1',
+  startAt: '2021-11-07T18:00:00.000Z',
+  endAt: '2021-11-08T01:00:00.000Z',
+  timezoneStartAt: TEST_TIMEZONE,
+};
+
 const eventData: any = {
-  '07-11-2021': [eventA, eventB],
+  '07-11-2021': [eventA, eventB, eventC],
 };
 
 describe(`allDayEvents funcs`, function () {
@@ -34,6 +43,7 @@ describe(`allDayEvents funcs`, function () {
 
     assert.equal(events[0].allDay, true);
     assert.equal(events[1].allDay, false);
+    assert.equal(events[1].allDay, false);
   });
   it('allDayEvent func: Should set props for allDay event', function () {
     const result: any = parseAllDayEvent(eventA, TEST_TIMEZONE);
@@ -42,6 +52,11 @@ describe(`allDayEvents funcs`, function () {
   });
   it('allDayEvent func: Should not set props for allDay event', function () {
     const result: any = parseAllDayEvent(eventB, TEST_TIMEZONE);
+
+    assert.equal(result.allDay, false);
+  });
+  it('allDayEvent func: Should not set props for allDay event', function () {
+    const result: any = parseAllDayEvent(eventC, TEST_TIMEZONE);
 
     assert.equal(result.allDay, false);
   });
