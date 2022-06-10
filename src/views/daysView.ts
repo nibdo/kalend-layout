@@ -5,11 +5,15 @@ import {
   EVENT_TABLE_DELIMITER_SPACE,
   SHOW_TIME_THRESHOLD,
 } from '../constants';
+import { LuxonHelper, parseToDateTime } from '../utils/LuxonHelper';
 import { calculatePositionForHeaderEvents } from '../utils/headerViewHelper';
 import { formatToDateKey } from '../utils/Helper';
-import { getCorrectWidth, getDaysNum } from '../utils/KalendHelper';
+import {
+  getCorrectWidth,
+  getDaysNum,
+  getEventDateTime,
+} from '../utils/KalendHelper';
 import { parseAllDayEventsArray } from '../utils/allDayEvents';
-import { parseToDateTime } from '../utils/LuxonHelper';
 
 const checkOverlappingYCoordinates = (
   item: any,
@@ -179,9 +183,18 @@ const calculateNormalEventPositions = (
       const isFullWidth = eventWidth === tableWidth;
       const offsetLeft = eventWidth * index;
 
+      // bring back original dates after calculations
+      const eventResult: any = { ...groupItem.event };
+      if (eventResult.original) {
+        eventResult.startAt = eventResult.original.startAt;
+        eventResult.endAt = eventResult.original.endAt;
+
+        delete eventResult.original;
+      }
+
       result.push({
         dateKey,
-        event: groupItem.event,
+        event: eventResult,
         height:
           groupItem.eventHeight < EVENT_MIN_HEIGHT
             ? EVENT_MIN_HEIGHT
@@ -254,11 +267,11 @@ export const getDaysViewLayout = (
   const normalEvents: any = {};
 
   eventsParsed.forEach((event) => {
-    const startDate: DateTime = parseToDateTime(
-      event.startAt,
-      event.timezoneStartAt || config.timezone
-    );
-    const key: string = formatToDateKey(startDate, config.timezone);
+    const { dateTimeStart, dateTimeEnd } = getEventDateTime(event, config);
+    const key: string = formatToDateKey(dateTimeStart, config.timezone);
+
+    // need to store each occurrence
+    const daySpawns: string[] = [];
 
     if (event.allDay) {
       headerEventsTemp.push(event);
@@ -268,7 +281,67 @@ export const getDaysViewLayout = (
         headerEvents[key] = [event];
       }
     } else {
-      if (normalEvents[key]) {
+      // check if start and end on different days
+      const isSameDay = LuxonHelper.isSameDay(dateTimeStart, dateTimeEnd);
+
+      // origin date to determine when event starts in each row
+      let originDate: any = formatToDateKey(dateTimeStart);
+
+      // handle multi-day
+      if (!isSameDay) {
+        for (let i = 0; i <= 1; i++) {
+          const refDate = dateTimeStart.plus({ days: i });
+          originDate = formatToDateKey(refDate);
+
+          const dateKey = formatToDateKey(refDate, config.timezone);
+
+          // store each day in multi-day event range
+          daySpawns.push(dateKey);
+
+          const eventClone: any = {
+            ...event,
+            originDate,
+            daysAfter: 1 - i,
+            original: {
+              startAt: event.startAt,
+              endAt: event.endAt,
+            },
+            startAt:
+              i === 1
+                ? parseToDateTime(
+                    event.endAt,
+                    event.timezoneStartAt,
+                    config.timezone
+                  )
+                    .set({ hour: 0, minute: 0, second: 0 })
+                    .toUTC()
+                    .toString()
+                : event.startAt,
+            endAt:
+              i === 0
+                ? parseToDateTime(
+                    event.startAt,
+                    event.timezoneStartAt,
+                    config.timezone
+                  )
+                    .set({ hour: 23, minute: 59, second: 59 })
+                    .toUTC()
+                    .toString()
+                : event.endAt,
+          };
+
+          eventClone.daySpawns = daySpawns;
+
+          if (!normalEvents[originDate]) {
+            normalEvents[originDate] = [eventClone];
+          } else {
+            normalEvents[originDate] = [
+              ...normalEvents[originDate],
+              ...[eventClone],
+            ];
+          }
+        }
+      } else if (normalEvents[key]) {
         normalEvents[key] = [...normalEvents[key], ...[event]];
       } else {
         normalEvents[key] = [event];
