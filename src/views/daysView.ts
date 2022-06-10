@@ -183,9 +183,18 @@ const calculateNormalEventPositions = (
       const isFullWidth = eventWidth === tableWidth;
       const offsetLeft = eventWidth * index;
 
+      // bring back original dates after calculations
+      const eventResult: any = { ...groupItem.event };
+      if (eventResult.original) {
+        eventResult.startAt = eventResult.original.startAt;
+        eventResult.endAt = eventResult.original.endAt;
+
+        delete eventResult.original;
+      }
+
       result.push({
         dateKey,
-        event: groupItem.event,
+        event: eventResult,
         height:
           groupItem.eventHeight < EVENT_MIN_HEIGHT
             ? EVENT_MIN_HEIGHT
@@ -261,6 +270,9 @@ export const getDaysViewLayout = (
     const { dateTimeStart, dateTimeEnd } = getEventDateTime(event, config);
     const key: string = formatToDateKey(dateTimeStart, config.timezone);
 
+    // need to store each occurrence
+    const daySpawns: string[] = [];
+
     if (event.allDay) {
       headerEventsTemp.push(event);
       if (headerEvents[key]) {
@@ -278,16 +290,47 @@ export const getDaysViewLayout = (
       // handle multi-day
       if (!isSameDay) {
         for (let i = 0; i <= 1; i++) {
-          if (i == 0) {
-            const refDate = dateTimeStart.plus({ days: i });
-            originDate = formatToDateKey(refDate);
-          }
+          const refDate = dateTimeStart.plus({ days: i });
+          originDate = formatToDateKey(refDate);
 
-          const eventClone = {
+          const dateKey = formatToDateKey(refDate, config.timezone);
+
+          // store each day in multi-day event range
+          daySpawns.push(dateKey);
+
+          const eventClone: any = {
             ...event,
             originDate,
             daysAfter: 1 - i,
+            original: {
+              startAt: event.startAt,
+              endAt: event.endAt,
+            },
+            startAt:
+              i === 1
+                ? parseToDateTime(
+                    event.endAt,
+                    event.timezoneStartAt,
+                    config.timezone
+                  )
+                    .set({ hour: 0, minute: 0, second: 0 })
+                    .toUTC()
+                    .toString()
+                : event.startAt,
+            endAt:
+              i === 0
+                ? parseToDateTime(
+                    event.startAt,
+                    event.timezoneStartAt,
+                    config.timezone
+                  )
+                    .set({ hour: 23, minute: 59, second: 59 })
+                    .toUTC()
+                    .toString()
+                : event.endAt,
           };
+
+          eventClone.daySpawns = daySpawns;
 
           if (!normalEvents[originDate]) {
             normalEvents[originDate] = [eventClone];
