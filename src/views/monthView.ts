@@ -1,4 +1,4 @@
-import { Config, WEEKDAY_START } from '../index';
+import { CALENDAR_VIEW, Config, WEEKDAY_START } from '../index';
 import {
   DEFAULT_ROW_LAYOUT_RESULT,
   RowLayoutResult,
@@ -13,7 +13,8 @@ import { getMonthRows } from '../utils/monthViewHelper';
 export const prepareMultiDayEvents = (
   events: any,
   config: Config,
-  breakPointDate?: string
+  breakPointDate?: string,
+  view?: CALENDAR_VIEW
 ) => {
   const preparedEvents: any = {};
   events.forEach((event: any) => {
@@ -26,7 +27,7 @@ export const prepareMultiDayEvents = (
     let originDate: any = formatToDateKey(dateTimeStart);
 
     // handle multi-day
-    if (!isSameDay) {
+    if (!isSameDay && view !== CALENDAR_VIEW.DAY) {
       const diffInDays = LuxonHelper.differenceInDays(
         dateTimeStart,
         dateTimeEnd

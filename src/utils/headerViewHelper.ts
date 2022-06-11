@@ -24,7 +24,8 @@ export const calculatePositionForHeaderEvents = (
   const preparedEvents: any = prepareMultiDayEvents(
     events,
     config,
-    breakPointDate
+    breakPointDate,
+    selectedView
   );
 
   const rowResult = getRowLayout(
