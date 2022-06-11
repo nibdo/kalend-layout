@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
+import { DateTime } from 'luxon';
 import { FLOATING_DATETIME, HEADER_EVENT_HEIGHT } from '../../constants';
 import { TEST_TIMEZONE, createConfigMock, getWeekDaysMock } from '../common';
 import KalendLayout from '../../views/main';
@@ -41,6 +42,16 @@ const eventD: any = {
   timezoneStartAt: TEST_TIMEZONE,
 };
 
+const eventE: any = {
+  id: '5',
+  summary: 'Test 5',
+  calendarID: '1',
+  startAt: '2021-11-16T00:00:00.000Z',
+  endAt: '2021-11-17T00:00:00.000Z',
+  timezoneStartAt: FLOATING_DATETIME,
+  allDay: true,
+};
+
 const weekViewLayoutData = (events?: CalendarEvent[]): LayoutRequestData => {
   return {
     calendarDays: getWeekDaysMock(),
@@ -48,6 +59,20 @@ const weekViewLayoutData = (events?: CalendarEvent[]): LayoutRequestData => {
     events: events ? events.map((item: CalendarEvent) => ({ ...item })) : [],
     height: 600,
     selectedView: CALENDAR_VIEW.WEEK,
+    width: 740,
+  };
+};
+
+const dayViewLayoutData = (
+  date: string,
+  events?: CalendarEvent[]
+): LayoutRequestData => {
+  return {
+    calendarDays: [DateTime.fromISO(date)],
+    config: createConfigMock(),
+    events: events ? events.map((item: CalendarEvent) => ({ ...item })) : [],
+    height: 600,
+    selectedView: CALENDAR_VIEW.DAY,
     width: 740,
   };
 };
@@ -279,6 +304,54 @@ describe(`weekView layout`, function () {
       result.headerPositions[0].event.startAt,
       '2021-11-17T00:00:00.000Z'
     );
+    assert.equal(
+      result.headerPositions[0].event.timezoneStartAt,
+      FLOATING_DATETIME
+    );
+    assert.equal(result.normalPositions?.['17-11-2021'].length, 0);
+  });
+
+  it('should return layout with all day event across two days', async function () {
+    const result = await KalendLayout(weekViewLayoutData([eventE]));
+
+    assert.equal(result.headerPositions.length, 1);
+    assert.equal(result.headerPositions[0].width, 199);
+    assert.equal(result.headerPositions[0].offsetLeft, 105.57142857142857);
+    assert.equal(result.headerPositions[0].event.allDay, true);
+    assert.equal(result.headerPositions[0].event.startAt, eventE.startAt);
+    assert.equal(
+      result.headerPositions[0].event.timezoneStartAt,
+      FLOATING_DATETIME
+    );
+    assert.equal(result.normalPositions?.['17-11-2021'].length, 0);
+  });
+
+  it('should return layout with all day event across two days for day view', async function () {
+    const result = await KalendLayout(
+      dayViewLayoutData(eventE.startAt, [eventE])
+    );
+
+    assert.equal(result.headerPositions.length, 1);
+    assert.equal(result.headerPositions[0].width, 667);
+    assert.equal(result.headerPositions[0].offsetLeft, 2);
+    assert.equal(result.headerPositions[0].event.allDay, true);
+    assert.equal(result.headerPositions[0].event.startAt, eventE.startAt);
+    assert.equal(
+      result.headerPositions[0].event.timezoneStartAt,
+      FLOATING_DATETIME
+    );
+    assert.equal(result.normalPositions?.['16-11-2021'].length, 0);
+  });
+  it('should return layout with all day event across two days for day view', async function () {
+    const result = await KalendLayout(
+      dayViewLayoutData(eventE.endAt, [eventE])
+    );
+
+    assert.equal(result.headerPositions.length, 1);
+    assert.equal(result.headerPositions[0].width, 667);
+    assert.equal(result.headerPositions[0].offsetLeft, 2);
+    assert.equal(result.headerPositions[0].event.allDay, true);
+    assert.equal(result.headerPositions[0].event.startAt, eventE.startAt);
     assert.equal(
       result.headerPositions[0].event.timezoneStartAt,
       FLOATING_DATETIME

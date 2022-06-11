@@ -18,7 +18,13 @@ export const LuxonHelper: any = {
     const diffInHours = diffInDaysObj.hours;
 
     if (diffInHours) {
-      return diffInHours <= 24 ? 0 : Number((diffInHours / 24).toFixed(0));
+      if (diffInHours < 24) {
+        return 0;
+      } else if (diffInHours === 24) {
+        return 1;
+      } else {
+        return Number((diffInHours / 24).toFixed(0));
+      }
     }
 
     return 0;

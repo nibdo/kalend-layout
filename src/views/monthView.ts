@@ -27,7 +27,7 @@ export const prepareMultiDayEvents = (
     let originDate: any = formatToDateKey(dateTimeStart);
 
     // handle multi-day
-    if (!isSameDay && view !== CALENDAR_VIEW.DAY) {
+    if (!isSameDay) {
       const diffInDays = LuxonHelper.differenceInDays(
         dateTimeStart,
         dateTimeEnd
@@ -51,7 +51,11 @@ export const prepareMultiDayEvents = (
         const weekDayBreakPoint =
           config.weekDayStart === WEEKDAY_START.MONDAY ? 7 : 1;
 
-        if (dateOfWeek === weekDayBreakPoint || i === diffInDays) {
+        if (
+          dateOfWeek === weekDayBreakPoint ||
+          i === diffInDays ||
+          view === CALENDAR_VIEW.DAY
+        ) {
           const eventClone = {
             ...event,
             originDate,
@@ -60,13 +64,24 @@ export const prepareMultiDayEvents = (
 
           eventClone.daySpawns = daySpawns;
 
-          if (!preparedEvents[originDate]) {
-            preparedEvents[originDate] = [eventClone];
+          if (view === CALENDAR_VIEW.DAY) {
+            if (!preparedEvents[dateKey]) {
+              preparedEvents[dateKey] = [eventClone];
+            } else {
+              preparedEvents[dateKey] = [
+                ...preparedEvents[dateKey],
+                ...[eventClone],
+              ];
+            }
           } else {
-            preparedEvents[originDate] = [
-              ...preparedEvents[originDate],
-              ...[eventClone],
-            ];
+            if (!preparedEvents[originDate]) {
+              preparedEvents[originDate] = [eventClone];
+            } else {
+              preparedEvents[originDate] = [
+                ...preparedEvents[originDate],
+                ...[eventClone],
+              ];
+            }
           }
 
           daySpawns = [];
