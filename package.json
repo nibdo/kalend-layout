@@ -1,6 +1,6 @@
 {
   "name": "kalend-layout",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "author": "nibdo",
   "license": "MIT",
   "private": false,
@@ -33,7 +33,6 @@
     "luxon": "2.4.0"
   },
   "scripts": {
-    "prepare": "npx husky install && npx husky add .husky/pre-commit \"npm run lint\"",
     "test": "ts-mocha --config ./mocharc.js",
     "start": "tsc && node dist/index.js",
     "build": "npm run compile && npm run copy",

@@ -28,7 +28,9 @@ const checkOverlappingYCoordinates = (
     (refFirstCoordinate > item.offsetTop &&
       refFirstCoordinate < item.itemLastCoordinate) ||
     (item.offsetTop < refFirstCoordinate &&
-      item.itemLastCoordinate > refLastCoordinate)
+      item.itemLastCoordinate > refLastCoordinate) ||
+    // starting at same time
+    item.offsetTop === refFirstCoordinate
   ) {
     return true;
   }
