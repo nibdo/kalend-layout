@@ -21,14 +21,14 @@ const checkOverlappingYCoordinates = (
   refLastCoordinate: number
 ) => {
   if (
-    (item.offsetTop >= refFirstCoordinate &&
-      item.offsetTop <= refLastCoordinate) ||
-    (refLastCoordinate >= item.offsetTop &&
-      refLastCoordinate <= item.offsetTop) ||
-    (refFirstCoordinate >= item.offsetTop &&
-      refFirstCoordinate <= item.itemLastCoordinate) ||
-    (item.offsetTop <= refFirstCoordinate &&
-      item.itemLastCoordinate >= refLastCoordinate)
+    (item.offsetTop > refFirstCoordinate &&
+      item.offsetTop < refLastCoordinate) ||
+    (refLastCoordinate > item.offsetTop &&
+      refLastCoordinate < item.offsetTop) ||
+    (refFirstCoordinate > item.offsetTop &&
+      refFirstCoordinate < item.itemLastCoordinate) ||
+    (item.offsetTop < refFirstCoordinate &&
+      item.itemLastCoordinate > refLastCoordinate)
   ) {
     return true;
   }
