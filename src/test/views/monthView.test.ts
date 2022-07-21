@@ -42,6 +42,15 @@ const eventD: any = {
   timezoneStartAt: TEST_TIMEZONE,
 };
 
+const eventE: any = {
+  id: '6',
+  summary: 'Test 3',
+  calendarID: '1',
+  startAt: '2021-11-05T20:00:00.000Z',
+  endAt: '2021-11-06T04:00:00.000Z',
+  timezoneStartAt: TEST_TIMEZONE,
+};
+
 const monthViewLayoutData = (events?: CalendarEvent[]): LayoutRequestData => {
   return {
     calendarDays: getMonthDaysMock(),
@@ -231,5 +240,16 @@ describe(`monthView layout`, function () {
     assert.equal(positions[0].offsetTop, 0);
     assert.equal(positions[0].width, 492);
     assert.equal(positions[0].offsetLeft, 2);
+  });
+
+  it('should return over night event across two days', async function () {
+    const result = await KalendLayout(monthViewLayoutData([eventE]));
+
+    const positions = result.positions?.[0];
+
+    assert.equal(positions.length, 1);
+    assert.equal(positions[0].event.daySpawns.length, 2);
+    assert.equal(positions[0].event.daySpawns[0], '05-11-2021');
+    assert.equal(positions[0].event.daySpawns[1], '06-11-2021');
   });
 });
