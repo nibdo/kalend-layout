@@ -28,10 +28,12 @@ export const prepareMultiDayEvents = (
 
     // handle multi-day
     if (!isSameDay) {
-      const diffInDays = LuxonHelper.differenceInDays(
-        dateTimeStart,
-        dateTimeEnd
-      );
+      let diffInDays = LuxonHelper.differenceInDays(dateTimeStart, dateTimeEnd);
+
+      // handle overnight events with less than 1 diffInDays
+      if (diffInDays === 0) {
+        diffInDays = 1;
+      }
 
       // need to store each occurrence
       let daySpawns: string[] = [];
