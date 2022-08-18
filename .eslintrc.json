@@ -4,10 +4,9 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["@typescript-eslint", "sort-imports-es6-autofix", "unused-imports"],
+  "plugins": ["@typescript-eslint", "sort-imports-es6-autofix"],
   "rules": {
     "no-console": "error",
-    "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/ban-ts-comment": "off",
