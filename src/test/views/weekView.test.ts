@@ -52,6 +52,16 @@ const eventE: any = {
   allDay: true,
 };
 
+const eventF: any = {
+  id: '6',
+  startAt: '2021-11-16T00:00:00.000Z',
+  endAt: '2021-11-17T23:59:59.999Z',
+  timezoneStartAt: 'UTC',
+  summary: 'Test 5',
+  calendarID: 'simple',
+  allDay: true,
+};
+
 const weekViewLayoutData = (events?: CalendarEvent[]): LayoutRequestData => {
   return {
     calendarDays: getWeekDaysMock(),
@@ -357,5 +367,14 @@ describe(`weekView layout`, function () {
       FLOATING_DATETIME
     );
     assert.equal(result.normalPositions?.['17-11-2021'].length, 0);
+  });
+
+  it('should spawn event to two days', async function () {
+    const result = await KalendLayout(weekViewLayoutData([eventF]));
+
+    const event = result.headerPositions[0].event;
+
+    assert.equal(result.headerPositions.length, 1);
+    assert.equal(event.daySpawns.length, 2);
   });
 });

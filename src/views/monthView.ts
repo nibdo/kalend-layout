@@ -43,10 +43,23 @@ export const prepareMultiDayEvents = (
       for (let i = 0; i <= diffInDays; i++) {
         const refDate = dateTimeStart.plus({ days: i });
 
-        const dateKey = formatToDateKey(refDate, config.timezone);
+        const dateKey = formatToDateKey(
+          refDate,
+          event.timezoneStartAt || config.timezone
+        );
 
-        // store each day in multi-day event range
-        daySpawns.push(dateKey);
+        // check if dateKey is same or less than end date
+        const endDateDateKey = formatToDateKey(
+          dateTimeEnd,
+          event.timezoneStartAt || config.timezone
+        );
+        if (
+          DateTime.fromFormat(endDateDateKey, 'dd-MM-yyyy').valueOf() >=
+          DateTime.fromFormat(dateKey, 'dd-MM-yyyy').valueOf()
+        ) {
+          // store each day in multi-day event range
+          daySpawns.push(dateKey);
+        }
 
         // break events spawned across multiple rows
         const dateOfWeek = refDate.weekday;

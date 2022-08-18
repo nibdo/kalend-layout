@@ -2,9 +2,13 @@ import { CalendarEvent } from '../index';
 import { DateTime } from 'luxon';
 import { parseToDateTime } from './LuxonHelper';
 
-// TODO should add timezone?
-export const formatToDateKey = (date: DateTime, timezone?: string) =>
-  date.setZone(timezone || 'Europe/Berlin').toFormat('dd-MM-yyyy');
+export const formatToDateKey = (date: DateTime, timezone?: string) => {
+  if (!timezone || timezone === 'floating') {
+    return date.toFormat('dd-MM-yyyy');
+  }
+
+  return date.setZone(timezone).toFormat('dd-MM-yyyy');
+};
 
 export const mapEventsToDate = (events: CalendarEvent[], timezone: string) => {
   const result: any = {};
