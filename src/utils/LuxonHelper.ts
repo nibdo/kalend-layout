@@ -35,7 +35,7 @@ export const parseToDateTime = (
   // @ts-ignore
   date: DateTime | string,
   zone: string,
-  deviceTimezone?: string
+  isFloating?: boolean
   // @ts-ignore
 ): DateTime => {
   const dateString: string = typeof date === 'string' ? date : date.toString();
@@ -43,7 +43,8 @@ export const parseToDateTime = (
   const isFloatingDatetime: boolean = zone === FLOATING_DATETIME;
 
   // Adjust date with timezone so when converted to UTC it represents correct value with fixed time
-  if (isFloatingDatetime) {
+  if (isFloatingDatetime || isFloating) {
+    //|| isFloating) {
     // @ts-ignore
     const dateFloating: DateTime = DateTime.fromISO(dateString, {
       zone: UTC_TIMEZONE,
@@ -51,17 +52,9 @@ export const parseToDateTime = (
 
     return dateFloating.toUTC();
   }
+
   // @ts-ignore
   const thisDate: DateTime = DateTime.fromISO(dateString);
-
-  if (!zone) {
-    // Adjust datetime to device timezone
-    if (deviceTimezone) {
-      return thisDate.setZone(deviceTimezone);
-    } else {
-      return thisDate;
-    }
-  }
 
   return thisDate.setZone(zone);
 };

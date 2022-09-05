@@ -31,7 +31,7 @@ export const parseAllDayEvents = (events: any, timezone: string) => {
 
     eventsItems.forEach((item: CalendarEvent) => {
       const dateKey: any = formatToDateKey(
-        parseToDateTime(item.startAt, item.timezoneStartAt || timezone)
+        parseToDateTime(item.startAt, timezone)
       );
 
       if (result[dateKey]) {

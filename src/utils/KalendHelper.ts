@@ -1,5 +1,6 @@
 import { CALENDAR_VIEW, CalendarEvent, Config } from '../index';
 import { ONE_DAY, SCROLLBAR_WIDTH, SEVEN_DAYS, THREE_DAYS } from '../constants';
+import { isEventFloating } from './Helper';
 import { parseToDateTime } from './LuxonHelper';
 
 export const getDaysNum = (calendarView: CALENDAR_VIEW): number => {
@@ -38,11 +39,13 @@ export const getCorrectWidth = (
 export const getEventDateTime = (event: CalendarEvent, config: Config) => {
   const dateTimeStart = parseToDateTime(
     event.startAt,
-    event.timezoneStartAt || config.timezone
+    config.timezone,
+    isEventFloating(event)
   );
   const dateTimeEnd = parseToDateTime(
     event.endAt,
-    event.timezoneStartAt || config.timezone
+    config.timezone,
+    isEventFloating(event)
   );
 
   return {

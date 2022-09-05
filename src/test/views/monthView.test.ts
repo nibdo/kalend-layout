@@ -46,8 +46,8 @@ const eventE: any = {
   id: '6',
   summary: 'Test 3',
   calendarID: '1',
-  startAt: '2021-11-05T20:00:00.000Z',
-  endAt: '2021-11-06T04:00:00.000Z',
+  startAt: '2021-11-05T19:00:00.000Z',
+  endAt: '2021-11-06T08:00:00.000Z',
   timezoneStartAt: TEST_TIMEZONE,
 };
 

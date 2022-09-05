@@ -5,10 +5,12 @@ import {
   getRowLayout,
 } from '../utils/commonHelper';
 import { DateTime } from 'luxon';
+import { FLOATING_DATETIME } from '../constants';
 import { LuxonHelper, parseToDateTime } from '../utils/LuxonHelper';
-import { formatToDateKey } from '../utils/Helper';
+import { formatToDateKey, isEventFloating } from '../utils/Helper';
 import { getEventDateTime } from '../utils/KalendHelper';
 import { getMonthRows } from '../utils/monthViewHelper';
+import { parseTimezone } from './daysView';
 
 export const prepareMultiDayEvents = (
   events: any,
@@ -24,15 +26,33 @@ export const prepareMultiDayEvents = (
     const isSameDay = LuxonHelper.isSameDay(dateTimeStart, dateTimeEnd);
 
     // origin date to determine when event starts in each row
-    let originDate: any = formatToDateKey(dateTimeStart);
+    let originDate: any = formatToDateKey(
+      dateTimeStart
+      // parseTimezone(config.timezone, event.timezoneStartAt ===
+      // 'floating') // TODO remove
+    );
 
     // handle multi-day
     if (!isSameDay) {
       let diffInDays = LuxonHelper.differenceInDays(dateTimeStart, dateTimeEnd);
 
       // handle overnight events with less than 1 diffInDays
-      if (diffInDays === 0) {
+      // but don't adjust behaviour for actual header events with floating
+      // timezone
+      if (diffInDays === 0 && !event.isFloating) {
         diffInDays = 1;
+      }
+
+      // handle all day events ending at 00:00:00 on next day and display
+      // them as single allDay event by subtracting one day from diff in days
+      if (
+        diffInDays > 0 &&
+        event.timezoneStartAt !== FLOATING_DATETIME && // TODO TEST
+        dateTimeEnd.hour === 0 &&
+        dateTimeEnd.minute === 0 &&
+        dateTimeEnd.second === 0
+      ) {
+        diffInDays = diffInDays - 1;
       }
 
       // need to store each occurrence
@@ -44,14 +64,14 @@ export const prepareMultiDayEvents = (
         const refDate = dateTimeStart.plus({ days: i });
 
         const dateKey = formatToDateKey(
-          refDate,
-          event.timezoneStartAt || config.timezone
+          refDate
+          // parseTimezone(config.timezone, event.timezoneStartAt === 'floating')
         );
 
         // check if dateKey is same or less than end date
         const endDateDateKey = formatToDateKey(
-          dateTimeEnd,
-          event.timezoneStartAt || config.timezone
+          dateTimeEnd
+          // parseTimezone(config.timezone, event.timezoneStartAt === 'floating')
         );
         if (
           DateTime.fromFormat(endDateDateKey, 'dd-MM-yyyy').valueOf() >=
@@ -102,18 +122,32 @@ export const prepareMultiDayEvents = (
           daySpawns = [];
         }
 
+        const getBreakPointDateWithZone = (date: string) =>
+          DateTime.fromFormat(date, 'yyyy-MM-DD').setZone(
+            parseTimezone(config.timezone, isEventFloating(event))
+          );
         if (
-          ((breakPointDate && breakPointDate === dateKey) ||
+          ((breakPointDate &&
+            formatToDateKey(
+              getBreakPointDateWithZone(breakPointDate),
+              parseTimezone(config.timezone, isEventFloating(event))
+            ) === dateKey) ||
             dateOfWeek === weekDayBreakPoint) &&
           i < diffInDays
         ) {
-          originDate = formatToDateKey(refDate.plus({ days: 1 }));
+          originDate = formatToDateKey(
+            refDate.plus({ days: 1 }),
+            parseTimezone(config.timezone, isEventFloating(event))
+          );
         }
       }
     } else {
       // single day event
       const dateKey = formatToDateKey(
-        parseToDateTime(event.startAt, event.timezoneStartAt || config.timezone)
+        parseToDateTime(
+          event.startAt,
+          parseTimezone(config.timezone, isEventFloating(event))
+        )
       );
 
       event.originDate = originDate;

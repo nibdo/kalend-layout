@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import { parseToDateTime } from './LuxonHelper';
 
 export const formatToDateKey = (date: DateTime, timezone?: string) => {
-  if (!timezone || timezone === 'floating') {
+  if (!timezone || date.zoneName === timezone) {
     return date.toFormat('dd-MM-yyyy');
   }
 
@@ -18,10 +18,7 @@ export const mapEventsToDate = (events: CalendarEvent[], timezone: string) => {
   }
 
   events?.forEach((event) => {
-    const startDate: DateTime = parseToDateTime(
-      event.startAt,
-      event.timezoneStartAt || timezone
-    );
+    const startDate: DateTime = parseToDateTime(event.startAt, timezone);
     const key: string = formatToDateKey(startDate);
 
     if (result[key]) {
@@ -42,4 +39,12 @@ export const parseToCalendarDays = (
   }
 
   return calendarDays as DateTime[];
+};
+
+export const isEventFloating = (event: CalendarEvent) => {
+  if (event?.timezoneStartAt === 'floating') {
+    return true;
+  }
+
+  return false;
 };

@@ -3,14 +3,17 @@ import { DateTime } from 'luxon';
 
 export const TEST_TIMEZONE = 'Europe/Berlin';
 
-export const createConfigMock = (weekDayStart?: WEEKDAY_START): Config => {
+export const createConfigMock = (
+  weekDayStart?: WEEKDAY_START,
+  timezone?: string
+): Config => {
   return {
     hasWorker: false,
     isDark: false,
     disableMobileDropdown: false,
     hourHeight: 40,
     timeFormat: TIME_FORMAT.H_24,
-    timezone: TEST_TIMEZONE,
+    timezone: timezone || TEST_TIMEZONE,
     weekDayStart: weekDayStart || WEEKDAY_START.MONDAY,
   };
 };
@@ -24,6 +27,17 @@ export const getWeekDaysMock = (date = '2021-11-15T10:52:09.797') => {
 
   return result;
 };
+
+export const getWeekDaysInDSTMock = (date = '2021-08-15T10:52:09.797') => {
+  const result: DateTime[] = [];
+
+  for (let i = 0; i < 7; i += 1) {
+    result.push(DateTime.fromISO(date).plus({ days: i }));
+  }
+
+  return result;
+};
+
 export const getWeekDaysMockStartingSunday = (
   date = '2021-11-14T10:52:09.797'
 ) => {

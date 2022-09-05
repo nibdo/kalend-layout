@@ -7,7 +7,7 @@ import {
 } from '../constants';
 import { LuxonHelper, parseToDateTime } from '../utils/LuxonHelper';
 import { calculatePositionForHeaderEvents } from '../utils/headerViewHelper';
-import { formatToDateKey } from '../utils/Helper';
+import { formatToDateKey, isEventFloating } from '../utils/Helper';
 import {
   getCorrectWidth,
   getDaysNum,
@@ -38,6 +38,19 @@ const checkOverlappingYCoordinates = (
   return false;
 };
 
+/**
+ * Set UTC for floating dates or use config timezone
+ * @param timezone
+ * @param isFloating
+ */
+export const parseTimezone = (timezone: string, isFloating?: boolean) => {
+  if (isFloating) {
+    return 'UTC';
+  }
+
+  return timezone;
+};
+
 const calculateNormalEventPositions = (
   events: CalendarEvent[],
   baseWidth: number,
@@ -66,17 +79,15 @@ const calculateNormalEventPositions = (
   sortedEvents = sortedEvents.map((event: CalendarEvent) => {
     const offsetTop: any =
       // @ts-ignore
-      parseToDateTime(event.startAt, event.timezoneStartAt, config.timezone)
+      parseToDateTime(event.startAt, config.timezone, event.isFloating)
         .diff(
-          parseToDateTime(
-            event.startAt,
-            event.timezoneStartAt,
-            config.timezone
-          ).set({
-            hour: 0,
-            minute: 0,
-            second: 0,
-          }),
+          parseToDateTime(event.startAt, config.timezone, event.isFloating).set(
+            {
+              hour: 0,
+              minute: 0,
+              second: 0,
+            }
+          ),
           'minutes'
         )
         .toObject().minutes /
@@ -84,8 +95,15 @@ const calculateNormalEventPositions = (
 
     const eventHeight: any =
       // @ts-ignore
-      parseToDateTime(event.endAt, event.timezoneStartAt)
-        .diff(parseToDateTime(event.startAt, event.timezoneStartAt), 'minutes')
+      parseToDateTime(event.endAt, config.timezone, isEventFloating(event))
+        .diff(
+          parseToDateTime(
+            event.startAt,
+            config.timezone,
+            isEventFloating(event.isFloating)
+          ),
+          'minutes'
+        )
         .toObject().minutes /
       (60 / config.hourHeight); // adjust based on hour column height
 
@@ -270,7 +288,10 @@ export const getDaysViewLayout = (
 
   eventsParsed.forEach((event) => {
     const { dateTimeStart, dateTimeEnd } = getEventDateTime(event, config);
-    const key: string = formatToDateKey(dateTimeStart, config.timezone);
+    const key: string = formatToDateKey(
+      dateTimeStart,
+      parseTimezone(config.timezone, isEventFloating(event))
+    );
 
     // need to store each occurrence
     const daySpawns: string[] = [];
@@ -287,15 +308,24 @@ export const getDaysViewLayout = (
       const isSameDay = LuxonHelper.isSameDay(dateTimeStart, dateTimeEnd);
 
       // origin date to determine when event starts in each row
-      let originDate: any = formatToDateKey(dateTimeStart);
+      let originDate: any = formatToDateKey(
+        dateTimeStart,
+        parseTimezone(config.timezone, isEventFloating(event))
+      );
 
       // handle multi-day
       if (!isSameDay) {
         for (let i = 0; i <= 1; i++) {
           const refDate = dateTimeStart.plus({ days: i });
-          originDate = formatToDateKey(refDate);
+          originDate = formatToDateKey(
+            refDate,
+            parseTimezone(config.timezone, isEventFloating(event))
+          );
 
-          const dateKey = formatToDateKey(refDate, config.timezone);
+          const dateKey = formatToDateKey(
+            refDate,
+            parseTimezone(config.timezone, isEventFloating(event))
+          );
 
           // store each day in multi-day event range
           daySpawns.push(dateKey);
@@ -312,8 +342,8 @@ export const getDaysViewLayout = (
               i === 1
                 ? parseToDateTime(
                     event.endAt,
-                    event.timezoneStartAt,
-                    config.timezone
+                    config.timezone,
+                    isEventFloating(event)
                   )
                     .set({ hour: 0, minute: 0, second: 0 })
                     .toUTC()
@@ -323,8 +353,8 @@ export const getDaysViewLayout = (
               i === 0
                 ? parseToDateTime(
                     event.startAt,
-                    event.timezoneStartAt,
-                    config.timezone
+                    config.timezone,
+                    isEventFloating(event)
                   )
                     .set({ hour: 23, minute: 59, second: 59 })
                     .toUTC()
