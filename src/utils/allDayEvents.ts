@@ -16,6 +16,7 @@ export const parseAllDayEvent = (
     allDay:
       event.allDay ||
       LuxonHelper.differenceInDays(dateTimeStart, dateTimeEnd) > 0,
+    isFloating: event.allDay,
   };
 };
 
@@ -31,7 +32,7 @@ export const parseAllDayEvents = (events: any, timezone: string) => {
 
     eventsItems.forEach((item: CalendarEvent) => {
       const dateKey: any = formatToDateKey(
-        parseToDateTime(item.startAt, item.timezoneStartAt || timezone)
+        parseToDateTime(item.startAt, timezone)
       );
 
       if (result[dateKey]) {

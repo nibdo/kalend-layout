@@ -38,11 +38,13 @@ export const getCorrectWidth = (
 export const getEventDateTime = (event: CalendarEvent, config: Config) => {
   const dateTimeStart = parseToDateTime(
     event.startAt,
-    event.timezoneStartAt || config.timezone
+    config.timezone,
+    event.allDay
   );
   const dateTimeEnd = parseToDateTime(
     event.endAt,
-    event.timezoneStartAt || config.timezone
+    config.timezone,
+    event.allDay
   );
 
   return {

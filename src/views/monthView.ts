@@ -43,16 +43,10 @@ export const prepareMultiDayEvents = (
       for (let i = 0; i <= diffInDays; i++) {
         const refDate = dateTimeStart.plus({ days: i });
 
-        const dateKey = formatToDateKey(
-          refDate,
-          event.timezoneStartAt || config.timezone
-        );
+        const dateKey = formatToDateKey(refDate, config.timezone);
 
         // check if dateKey is same or less than end date
-        const endDateDateKey = formatToDateKey(
-          dateTimeEnd,
-          event.timezoneStartAt || config.timezone
-        );
+        const endDateDateKey = formatToDateKey(dateTimeEnd, config.timezone);
         if (
           DateTime.fromFormat(endDateDateKey, 'dd-MM-yyyy').valueOf() >=
           DateTime.fromFormat(dateKey, 'dd-MM-yyyy').valueOf()
@@ -113,7 +107,7 @@ export const prepareMultiDayEvents = (
     } else {
       // single day event
       const dateKey = formatToDateKey(
-        parseToDateTime(event.startAt, event.timezoneStartAt || config.timezone)
+        parseToDateTime(event.startAt, config.timezone)
       );
 
       event.originDate = originDate;

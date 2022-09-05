@@ -60,7 +60,7 @@ const prepareMultiDayEvents = (events: any, config: Config) => {
     } else {
       // single day event
       const dateKey = formatToDateKey(
-        parseToDateTime(event.startAt, event.timezoneStartAt || config.timezone)
+        parseToDateTime(event.startAt, config.timezone)
       );
 
       event.originDate = originDate;

@@ -24,6 +24,17 @@ export const getWeekDaysMock = (date = '2021-11-15T10:52:09.797') => {
 
   return result;
 };
+
+export const getWeekDaysInDSTMock = (date = '2021-08-15T10:52:09.797') => {
+  const result: DateTime[] = [];
+
+  for (let i = 0; i < 7; i += 1) {
+    result.push(DateTime.fromISO(date).plus({ days: i }));
+  }
+
+  return result;
+};
+
 export const getWeekDaysMockStartingSunday = (
   date = '2021-11-14T10:52:09.797'
 ) => {

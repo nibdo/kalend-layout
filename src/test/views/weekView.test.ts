@@ -2,7 +2,12 @@
 import { CALENDAR_VIEW, CalendarEvent, LayoutRequestData } from '../../index';
 import { DateTime } from 'luxon';
 import { FLOATING_DATETIME, HEADER_EVENT_HEIGHT } from '../../constants';
-import { TEST_TIMEZONE, createConfigMock, getWeekDaysMock } from '../common';
+import {
+  TEST_TIMEZONE,
+  createConfigMock,
+  getWeekDaysInDSTMock,
+  getWeekDaysMock,
+} from '../common';
 import KalendLayout from '../../views/main';
 import assert from 'assert';
 
@@ -15,6 +20,7 @@ const eventA: any = {
   timezoneStartAt: TEST_TIMEZONE,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const eventB: any = {
   id: '1',
   summary: 'Test 1',
@@ -62,9 +68,39 @@ const eventF: any = {
   allDay: true,
 };
 
+const eventG: any = {
+  id: '1',
+  summary: 'Test 1',
+  calendarID: '1',
+  startAt: '2021-11-15T22:00:00.000Z',
+  endAt: '2021-11-16T09:00:00.000Z',
+  timezoneStartAt: TEST_TIMEZONE,
+};
+const eventH: any = {
+  id: '1',
+  summary: 'Test 1',
+  calendarID: '1',
+  startAt: '2021-08-15T22:00:00.000Z',
+  endAt: '2021-08-16T09:00:00.000Z',
+  timezoneStartAt: TEST_TIMEZONE,
+};
+
 const weekViewLayoutData = (events?: CalendarEvent[]): LayoutRequestData => {
   return {
     calendarDays: getWeekDaysMock(),
+    config: createConfigMock(),
+    events: events ? events.map((item: CalendarEvent) => ({ ...item })) : [],
+    height: 600,
+    selectedView: CALENDAR_VIEW.WEEK,
+    width: 740,
+  };
+};
+
+const weekViewLayoutDataInDST = (
+  events?: CalendarEvent[]
+): LayoutRequestData => {
+  return {
+    calendarDays: getWeekDaysInDSTMock(),
     config: createConfigMock(),
     events: events ? events.map((item: CalendarEvent) => ({ ...item })) : [],
     height: 600,
@@ -111,8 +147,24 @@ describe(`weekView layout`, function () {
     assert.equal(eventCResult.event.allDay, false);
   });
 
-  it('should return layout with event that cross midnight', async function () {
-    const result = await KalendLayout(weekViewLayoutData([eventB]));
+  it('should return layout with event in DST', async function () {
+    const result = await KalendLayout(weekViewLayoutDataInDST([eventH]));
+
+    const eventBResultTwo = result.normalPositions?.['16-08-2021'][0];
+
+    assert.equal(result.headerPositions.length, 0);
+    assert.equal(result.normalPositions?.['15-08-2021'].length, 0);
+    assert.equal(result.normalPositions?.['16-08-2021'].length, 1);
+
+    assert.equal(eventBResultTwo.height, 440);
+    assert.equal(eventBResultTwo.width, 95.28571428571428);
+    assert.equal(eventBResultTwo.offsetLeft, 0);
+    assert.equal(eventBResultTwo.offsetTop, 0);
+    assert.equal(eventBResultTwo.event.allDay, false);
+  });
+
+  it('should return layout with event DST false', async function () {
+    const result = await KalendLayout(weekViewLayoutData([eventG]));
 
     const eventBResultOne = result.normalPositions?.['15-11-2021'][0];
     const eventBResultTwo = result.normalPositions?.['16-11-2021'][0];
@@ -120,12 +172,12 @@ describe(`weekView layout`, function () {
     assert.equal(result.headerPositions.length, 0);
     assert.equal(result.normalPositions?.['15-11-2021'].length, 1);
     assert.equal(result.normalPositions?.['16-11-2021'].length, 1);
+
     assert.equal(eventBResultOne.height, 39.98888888888889);
     assert.equal(eventBResultOne.width, 95.28571428571428);
     assert.equal(eventBResultOne.offsetLeft, 0);
     assert.equal(eventBResultOne.offsetTop, 920);
     assert.equal(eventBResultOne.event.allDay, false);
-
     assert.equal(eventBResultTwo.height, 400);
     assert.equal(eventBResultTwo.width, 95.28571428571428);
     assert.equal(eventBResultTwo.offsetLeft, 0);
@@ -369,12 +421,12 @@ describe(`weekView layout`, function () {
     assert.equal(result.normalPositions?.['17-11-2021'].length, 0);
   });
 
-  it('should spawn event to two days', async function () {
+  it('should spawn event to three days', async function () {
     const result = await KalendLayout(weekViewLayoutData([eventF]));
 
     const event = result.headerPositions[0].event;
 
     assert.equal(result.headerPositions.length, 1);
-    assert.equal(event.daySpawns.length, 2);
+    assert.equal(event.daySpawns.length, 3);
   });
 });
